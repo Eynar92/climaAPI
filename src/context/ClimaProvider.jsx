@@ -11,6 +11,8 @@ const ClimaProvider = ({ children }) => {
     })
 
     const [resultado, setResultado] = useState({})
+    const [cargando, setCargando] = useState(false)
+    const [noResultado, setNoResultado] = useState("")
 
     const datosBusqueda = e => {
         setBusqueda({
@@ -20,6 +22,8 @@ const ClimaProvider = ({ children }) => {
     }
 
     const consultarClima = async datos => {
+        setCargando(true);
+
         try {
             const { ciudad, pais } = datos;
 
@@ -29,16 +33,18 @@ const ClimaProvider = ({ children }) => {
 
             const { data } = await axios(url);
             const { lat, lon } = data[0];
-
+            console.log(data[0]);
             const urlClima = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${appId}`;
 
             const { data: clima } = await axios(urlClima);
+            console.log(clima);
             setResultado(clima);
-
+            setCargando(false)
         } catch (error) {
-            console.log(error);
+            alert('No hay resultados');
         }
     }
+
 
     return (
         <ClimaContext.Provider
@@ -46,14 +52,17 @@ const ClimaProvider = ({ children }) => {
                 busqueda,
                 datosBusqueda,
                 consultarClima,
-                resultado
+                resultado,
+                cargando,
+                noResultado,
+                setResultado
             }}
         >
             {children}
         </ClimaContext.Provider>
     )
-}
 
+}
 export {
     ClimaProvider
 }
